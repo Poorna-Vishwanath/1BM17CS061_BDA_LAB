@@ -1,0 +1,78 @@
+
+cqlsh> create keyspace Student with replication = {'class' : 'SimpleStrategy','replication_factor' : '1'} and durable_writes = 'true';
+
+cqlsh:student> describe keyspaces
+
+student  system_auth         system_schema  system_views         
+system   system_distributed  system_traces  system_virtual_schema
+
+cqlsh:student> CREATE TABLE student_info (Student_Id int PRIMARY KEY , Student_Name text , DOJ text , Semester int, Dept_Name text);
+
+cqlsh:student> describe tables
+
+student_info
+
+describe COLUMNFAMILies;
+
+student_info
+
+cqlsh:student> describe table student_info 
+
+CREATE TABLE student.student_info (
+    student_id int PRIMARY KEY,
+    dept_name text,
+    doj text,
+    semester int,
+    student_name text
+) WITH additional_write_policy = '99p'
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND cdc = false
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '16', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND default_time_to_live = 0
+    AND extensions = {}
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair = 'BLOCKING'
+    AND speculative_retry = '99p';
+    
+    
+    
+cqlsh:student> insert into student_info (Student_Id, Student_Name, DOJ, Semester, Dept_Name) values (1,'Poorna','16/9/2017',7,'CSE');
+cqlsh:student> select * from student_info;
+
+ student_id | dept_name | doj       | semester | student_name
+------------+-----------+-----------+----------+--------------
+          1 |       CSE | 16/9/2017 |        7 |     Poorna
+
+(1 rows)
+cqlsh:student> BEGIN BATCH 
+           ... insert into Student_info (Student_Id, Student_Name, DOJ, Semester, Dept_Name) values (2,'Pari','15/8/2018',6,'ISE');
+           ... insert into Student_info (Student_Id, Student_Name, DOJ, Semester, Dept_Name) values (3,'Preeti','16/9/2012',4,'ECE');
+           ... insert into Student_info (Student_Id, Student_Name, DOJ, Semester, Dept_Name) values (4,'naveen','18/12/2015',8,'CSE');
+           ... APPLY BATCH ;
+           
+           
+cqlsh:student> select * from student_info;
+
+ student_id | dept_name | doj        | semester | student_name
+------------+-----------+------------+----------+--------------
+          1 |       CSE |  16/9/2017 |        7 |       Poorna
+          2 |       ISE |  15/8/2018 |        6 |       Pari
+          4 |       CSE | 18/12/2015 |        7 |       naveen
+          3 |       ISE |  8/12/2017 |        4 |       Preeti
+          
+cqlsh:student> update student_info set student_name = 'Priya' WHERE  student_id = 3;
+cqlsh:student> select * from student_info;
+
+ student_id | dept_name | doj        | semester | student_name
+------------+-----------+------------+----------+--------------
+          1 |       CSE |  16/9/2017 |        7 |     Poorna
+          2 |       ISE |  15/8/2018 |        6 |      Pari
+          4 |       CSE | 18/12/2015 |        7 |       naveen
+          3 |       ISE |  8/12/2017 |        4 |        Priya
