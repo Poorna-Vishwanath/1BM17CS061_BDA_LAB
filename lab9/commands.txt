@@ -1,0 +1,29 @@
+# To create a database and use it
+
+	CREATE DATABASE IF NOT EXISTS students COMMENT 'Student Details' WITH DBPROPERTIES('creator'='Kratharth');
+
+	use students;
+	
+# Create an external table named  with the following attributes  
+	Empl_ID    ->Emp_Name    -> Designation    -> Salary
+ 
+ 	CREATE EXTERNAL TABLE IF NOT EXISTS EMPLOYEE(Emp_id INT,Emp_Name STRING,Designation STRING,Salary INT) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t' LOCATION '/EMPLOYEE_INFO';
+ 	
+# To load the data into the table
+	LOAD DATA LOCAL INPATH '/home/kratharth/BDA Lab/BDA_LAB/Lab 9/data.txt' OVERWRITE INTO TABLE EMPLOYEE;
+
+# To create a view and getting the salary > 30000
+	CREATE VIEW employee_view as SELECT * FROM EMPLOYEE WHERE SALARY>30000; 
+
+# To alter the table and add a column called Dept_ID and Generate a query to retrieve the employee details in order by using Dept_Id
+	
+	ALTER TABLE EMPLOYEE ADD COLUMnS(DEPT_ID INT);
+	SELECT * FROM EMPLOYEE ORDER BY DEPT_ID ASC;
+	
+SELECT DEPT_ID,count(*) FROM EMPLOYEE GROUP BY DEPT_ID,SALARY HAVING SALARY>30000;
+
+
+	CREATE TABLE IF NOT EXISTS department(DEPT_ID INT, DEPT_NAME STRING, EMP_ID ARRAY<STRING>) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t' COLLECTION ITEMS TERMINATED BY ':';
+	LOAD DATA LOCAL INPATH '/home/kratharth/BDA Lab/BDA_LAB/Lab 9/dept_data.txt' OVERWRITE INTO TABLE department
+
+	SELECT a.EMP_ID, A.EMP_NAME,a.DESIGNATION,a.SALARY,b.DEPT_NAME FROM EMPLOYEE a JOIN DEPARTMENT b ON a.DEPT_ID=b.DEPT_ID;
